@@ -292,7 +292,9 @@ func (q *commandQueue) flush() error {
 		}
 	}
 
-	theGraphicsDriver.Begin()
+	if err := theGraphicsDriver.Begin(); err != nil {
+		return err
+	}
 	cs := q.commands
 	for len(cs) > 0 {
 		nv := 0
@@ -312,7 +314,9 @@ func (q *commandQueue) flush() error {
 			nc++
 		}
 		if 0 < ne {
-			theGraphicsDriver.SetVertices(vs[:nv], es[:ne])
+			if err := theGraphicsDriver.SetVertices(vs[:nv], es[:ne]); err != nil {
+				return err
+			}
 			es = es[ne:]
 			vs = vs[nv:]
 		}
@@ -331,7 +335,9 @@ func (q *commandQueue) flush() error {
 		}
 		cs = cs[nc:]
 	}
-	theGraphicsDriver.End()
+	if err := theGraphicsDriver.End(); err != nil {
+		return err
+	}
 
 	// Release the commands explicitly (#1803).
 	// Apparently, the part of a slice between len and cap-1 still holds references.

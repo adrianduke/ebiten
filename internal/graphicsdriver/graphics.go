@@ -45,13 +45,13 @@ type Uniform struct {
 }
 
 type Graphics interface {
-	Begin()
-	End()
+	Initialize() error
+	Begin() error
+	End() error
 	SetTransparent(transparent bool)
-	SetVertices(vertices []float32, indices []uint16)
+	SetVertices(vertices []float32, indices []uint16) error
 	NewImage(width, height int) (Image, error)
 	NewScreenFramebufferImage(width, height int) (Image, error)
-	Initialize() error
 	SetVsyncEnabled(enabled bool)
 	SetFullscreen(fullscreen bool)
 	FramebufferYDirection() YDirection

@@ -363,17 +363,19 @@ func Get() *Graphics {
 	return &theGraphics
 }
 
-func (g *Graphics) Begin() {
+func (g *Graphics) Begin() error {
 	// NSAutoreleasePool is required to release drawable correctly (#847).
 	// https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/MTLBestPracticesGuide/Drawables.html
 	g.pool = C.allocAutoreleasePool()
+	return nil
 }
 
-func (g *Graphics) End() {
+func (g *Graphics) End() error {
 	g.flushIfNeeded(true)
 	g.screenDrawable = ca.MetalDrawable{}
 	C.releaseAutoreleasePool(g.pool)
 	g.pool = nil
+	return nil
 }
 
 func (g *Graphics) SetWindow(window uintptr) {
@@ -457,7 +459,7 @@ func (g *Graphics) availableBuffer(length uintptr) mtl.Buffer {
 	return newBuf
 }
 
-func (g *Graphics) SetVertices(vertices []float32, indices []uint16) {
+func (g *Graphics) SetVertices(vertices []float32, indices []uint16) error {
 	vbSize := unsafe.Sizeof(vertices[0]) * uintptr(len(vertices))
 	ibSize := unsafe.Sizeof(indices[0]) * uintptr(len(indices))
 
@@ -466,6 +468,8 @@ func (g *Graphics) SetVertices(vertices []float32, indices []uint16) {
 
 	g.ib = g.availableBuffer(ibSize)
 	g.ib.CopyToContents(unsafe.Pointer(&indices[0]), ibSize)
+
+	return nil
 }
 
 func (g *Graphics) flushIfNeeded(present bool) {
